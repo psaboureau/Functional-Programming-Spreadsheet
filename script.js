@@ -1,5 +1,3 @@
-console.clear();
-
 const infixToFunction = {
   "+": (x, y) => x + y,
   "-": (x, y) => x - y,
@@ -71,10 +69,7 @@ const charRange = (start, end) =>
     String.fromCharCode(code)
   );
 
-// x represents the formula sliced (( A12:B14))
-
 const evalFormula = (x, cells) => {
-  console.log("x: " + x);
   const idToText = (id) => cells.find((cell) => cell.id === id).value;
   const rangeRegex = /([A-J])([1-9][0-9]?):([A-J])([1-9][0-9]?)/gi;
   const rangeFromString = (num1, num2) => range(parseInt(num1), parseInt(num2));
@@ -82,25 +77,19 @@ const evalFormula = (x, cells) => {
   const addCharacters = (character1) => (character2) => (num) =>
     charRange(character1, character2).map(elemValue(num));
 
-  // convert range into there actual cell value, e.g. =SUM(A1:C1) >>> =SUM(4, 4, 4)
-
   const rangeExpanded = x.replace(
     rangeRegex,
     (_match, char1, num1, char2, num2) =>
       rangeFromString(num1, num2).map(addCharacters(char1)(char2))
   );
 
-  console.log("rangeExpanded: " + rangeExpanded);
-
-  // convert indvidual cell into value, e.g. =A1+B1+C1  >>>  =4+4+4
-
   const cellRegex = /[A-J][1-9][0-9]?/gi;
   const cellExpanded = rangeExpanded.replace(cellRegex, (match) =>
     idToText(match.toUpperCase())
   );
 
-  console.log("cellExpanded: " + cellExpanded);
   const functionExpanded = applyFunction(cellExpanded);
+
   return functionExpanded === x
     ? functionExpanded
     : evalFormula(functionExpanded, cells);
